@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const app = express();
+require("dotenv").config();
 
 const BASE_URL = "https://www.thesportsdb.com/api/v1/json/3";
 
