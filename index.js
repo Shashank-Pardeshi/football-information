@@ -1,9 +1,12 @@
 const express = require("express");
 const axios = require("axios");
 const app = express();
+const db = require("./db");
 require("dotenv").config();
 
 const BASE_URL = "https://www.thesportsdb.com/api/v1/json/3";
+
+app.use(express.json());
 
 // Home route
 app.get("/", (req, res) => {
@@ -35,6 +38,36 @@ app.get("/api/footballers/:teamName", async (req, res) => {
     }));
 
     res.json(formatted);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "Error fetching data from TheSportsDB" });
+  }
+});
+
+// Get players from a team
+app.post("/add-data", async (req, res) => {
+  try {
+    let { namee, team } = req.body;
+    db.query(
+      "INSERT INTO INFO (name, team) values (?, ?)",
+      [namee, team],
+      (err, results) => {
+        if (err) throw err;
+        res.json(results);
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/get-data", async (req, res) => {
+  try {
+    db.query("SELECT * FROM info", (err, results) => {
+      if (err) throw err;
+      res.json(results);
+    });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: "Error fetching data from TheSportsDB" });
